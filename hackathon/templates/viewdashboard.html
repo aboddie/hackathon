@@ -104,7 +104,9 @@
 							new Chart(document.getElementById('Chart{{row_num}}_{{col_num}}'), {
 								  type: '{{viz["chartType"]}}',
 								  data: {
-									  labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
+									  {% if viz["legendConcept"]%}
+										labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
+									  {% endif %}
 									  datasets: [{
 										data: {{viz["DATA"]}}
 									  }]
@@ -126,7 +128,9 @@
 							new Chart(document.getElementById('Chart{{row_num}}_{{col_num}}'), {
 								  type: '{{viz["chartType"]}}',
 								  data: {
-									  labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
+									  {% if viz["legendConcept"]%}
+										labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
+									  {% endif %}
 									  datasets: [{
 										data: {{viz["DATA"]}}
 									  }]
