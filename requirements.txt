@@ -1,5 +1,5 @@
-jinja2==3.0.1
-Flask==1.1.2
-PyYAML==5.4.1
-pandasdmx==1.6.0
+jinja2>=3.0.1
+Flask>=1.1.2
+PyYAML>=5.4.1
+pandasdmx>=1.6.0
 
