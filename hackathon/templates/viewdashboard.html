@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<!-- Bootstrap CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+		<link rel="stylesheet" type = "text/css" href="{{ url_for('static', filename='main.css') }}">
+		
+		<title>SDMX Dashboard</title>
+		
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	<!-- TODO: 
+		1. Break into 3 laysouts (1) base (2) viz and (edit)
+		2. drop loadLayout() can just populate these items directly
+		3. get ride of titleCase(mystring) and figure out a better way to pass info from python
+	-->
+	{% block editscripts %}{% endblock editscripts %}
+	
+	</head>
+	<body onload="loadLayout()">
+		<header class="site-header">
+			<nav class="navbar navbar-expand-sm navbar-dark bg-primary fixed-top">
+				<div class="container-fluid"> 
+					<a class="navbar-brand" href="{{url_for('home')}}">SDMX Dashboard</a>
+					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarToggle">
+						<div class="navbar-nav mr-auto">
+							<a class="nav-item nav-link" href="{{url_for('home')}}">Create Dashboard</a>
+							<li class="nav-item dropdown">
+							  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								Saved Dashboards
+							  </a>
+							  <ul class="dropdown-menu">
+								{% for dashboard in saved_dashboards %}
+									<li><a class="dropdown-item" href="{{url_for('viewdashboard', dashid=dashboard)}}">{{ dashboard }}</a></li>
+								{% endfor %}
+							  </ul>
+							</li>
+						</div>
+					</div>
+				</div>
+			</nav>
+		</header>
+		{% block sidebars %}{% endblock sidebars %}
+
+		<main role="main" class="container-fluid">
+			<div class="row">
+				{% block editbuttons %} {%endblock editbuttons %}		
+				<div class="container-fluid">
+				{%for row in table_setup%}
+					<div class="row">
+						{%set row_num = loop.index%}
+						{%for viz in row%}
+							{%set col_num = loop.index%}
+							<div class="{{ viz['width'] }} border border-dark .flex-nowrap position-relative">
+								<div class="position-absolute top-0 end-0">
+									<div class="btn-group">
+										{% if viz["dataLink"] %}
+											<a type="button" class="btn btn-outline-primary btn-sm float-end" href='{{viz["dataLink"]}}', target ='_blank')>Data</a>
+										{% endif %}
+										{% if viz["metadataLink"] %}
+											<a type="button" class="btn btn-outline-primary btn-sm float-end" href='{{viz["metadataLink"]}}', target ='_blank')>Metadata</a>
+										{% endif %}
+										{% block charteditbuttons scoped %} {% endblock charteditbuttons %}
+									</div>
+								</div>
+								{% if viz["Title"] %}
+									{{ viz["TitleFormated"] | safe }}
+								{% endif %}
+								{% if viz["Subtitle"] %}
+									{{ viz["SubtitleFormated"] | safe }}
+								{% endif %}
+								{% if viz["Note"] %}
+									{{ viz["NoteFormated"] | safe }}
+								{% endif %}
+								
+								{% if viz["chartType"] != 'title'%}
+									<canvas id="Chart{{row_num}}_{{col_num}}"></canvas>
+								{% endif %}
+							</div>
+						{% endfor %}
+					</div>
+				{% endfor %}
+				</div>
+			</div>
+			<script>
+				{%for row in table_setup%}	
+					{%set row_num = loop.index%}
+					{%for viz in row%}
+						{%set col_num = loop.index%}
+						{% if viz["chartType"] == 'value'%}
+							const canvas{{row_num}}_{{col_num}} = document.getElementById('Chart{{row_num}}_{{col_num}}');
+							const ctx{{row_num}}_{{col_num}} = canvas{{row_num}}_{{col_num}}.getContext("2d");
+							ctx{{row_num}}_{{col_num}}.textAlign = "center";
+							ctx{{row_num}}_{{col_num}}.font = "30px Arial";
+							ctx{{row_num}}_{{col_num}}.fillText({{viz["DATA"][0]}}, canvas{{row_num}}_{{col_num}}.width / 2, 30);
+						{% elif  viz["chartType"] == 'pie' %}
+							new Chart(document.getElementById('Chart{{row_num}}_{{col_num}}'), {
+								  type: '{{viz["chartType"]}}',
+								  data: {
+									  labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
+									  datasets: [{
+										data: {{viz["DATA"]}}
+									  }]
+								  },
+								  options: {
+									plugins: {
+										legend: {
+											{% if viz["legendLoc"] == 'hide' %}
+												display: false
+											{% else %}
+												display: true,
+												position: '{{viz["legendLoc"]}}'
+											{% endif %}
+										}
+									}
+								  }
+								});
+						{% elif  viz["chartType"] == 'lines' %}
+							new Chart(document.getElementById('Chart{{row_num}}_{{col_num}}'), {
+								  type: '{{viz["chartType"]}}',
+								  data: {
+									  labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
+									  datasets: [{
+										data: {{viz["DATA"]}}
+									  }]
+								  },
+								  options: {
+									plugins: {
+										legend: {
+											{% if viz["legendLoc"] == 'hide' %}
+												display: false
+											{% else %}
+												display: true,
+												position: '{{viz["legendLoc"]}}'
+											{% endif %}
+										}
+									}
+								  }
+								});
+						{% elif  viz["chartType"] == 'bar' %}
+							new Chart(document.getElementById('Chart{{row_num}}_{{col_num}}'), {
+								  type: '{{viz["chartType"]}}',
+								  data: {
+									  labels: [{%for concept in viz["xAxisConcept"]%}'{{concept}}', {% endfor %}],
+									  datasets: [{
+										data: {{viz["DATA"]}}
+									  }]
+								  },
+								  options: {
+									plugins: {
+										legend: {
+											{% if viz["legendLoc"] == 'hide' %}
+												display: false
+											{% else %}
+												display: true,
+												position: '{{viz["legendLoc"]}}'
+											{% endif %}
+										}
+									}
+								  }
+								});
+						{% elif   viz["chartType"] == 'unconfigured'%}
+							const canvas{{row_num}}_{{col_num}} = document.getElementById('Chart{{row_num}}_{{col_num}}');
+							const ctx{{row_num}}_{{col_num}} = canvas{{row_num}}_{{col_num}}.getContext("2d");
+							ctx{{row_num}}_{{col_num}}.textAlign = "center";
+							ctx{{row_num}}_{{col_num}}.fillStyle = "red";
+							ctx{{row_num}}_{{col_num}}.fillText('Please configure', canvas{{row_num}}_{{col_num}}.width / 2, 30);
+						{% endif %}
+					{% endfor %}
+				{% endfor %}
+			</script>
+		</main>
+		<!-- Bootstrap JS -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+	</body>
+</html>

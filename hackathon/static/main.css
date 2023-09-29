@@ -1,0 +1,22 @@
+.row {
+	justify-content: center;
+}
+
+button {
+	margin: 10px;
+}
+
+textarea {
+    resize: none;
+}
+
+body {
+  margin-top: 5rem;
+  margin-bottom: 1rem;
+}
+
+canvas {
+  padding: 0;
+  margin: auto;
+  display: block;
+}

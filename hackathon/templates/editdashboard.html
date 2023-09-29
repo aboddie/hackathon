@@ -1,0 +1,348 @@
+{% extends "viewdashboard.html" %}
+
+{% block editscripts %}
+<script>
+function loadLayout() {
+	document.getElementById("num_of_rows").value = {{ table_setup|count }};
+	{% for list in table_setup %}
+		{%set num_of_col_row = list|count %}
+		document.getElementById("num_of_col_row{{ loop.index }}").value = {{ num_of_col_row }};
+		document.getElementById("num_of_col_row{{ loop.index }}_fg").removeAttribute("hidden");
+	{% endfor %}
+}
+function num_of_rows_changed() {
+	rows_to_show = document.getElementById("num_of_rows").value
+	for (let i = 1; i < 5; i++){
+		if (i <= rows_to_show) {
+			document.getElementById(`num_of_col_row${i}_fg`).removeAttribute("hidden");
+		} else {
+			document.getElementById(`num_of_col_row${i}_fg`).setAttribute("hidden", "hidden");
+		}
+	}
+}
+function titleCase(mystring) {
+return mystring.toLowerCase().split(' ').map((s) => {
+	let letterToCapitalize = s.match(/\w/)[0];
+	return s.replace(letterToCapitalize, letterToCapitalize.toUpperCase())
+	}).join(' ');
+}
+function loadVisualConfiguration(row_num, col_num, viz_json) {
+	const viz = JSON.parse(JSON.stringify(viz_json));
+	document.getElementById("viz_row_num").value = row_num;
+	document.getElementById("viz_col_num").value = col_num;
+	document.getElementById("chartType").value = titleCase(viz.chartType);
+	document.getElementById("Title").value = viz.Title;
+	document.getElementById("Subtitle").value = viz.Subtitle;
+	document.getElementById("Note").value = viz.Note;
+	document.getElementById("Unit").value = viz.Unit;
+	document.getElementById("unitLoc").value = viz.unitLoc;
+	document.getElementById("Decimals").value = viz.Decimals;
+	//document.getElementById("Display Labels").value = viz.LabelsYN;
+	document.getElementById("legendConcept").value = viz.legendConcept;
+	document.getElementById("legendLoc").value = titleCase(viz.legendLoc);
+	document.getElementById("xAxisConcept").value = viz.xAxisConcept;
+	document.getElementById("yAxisConcept").value = viz.yAxisConcept;
+	//document.getElementById("downloadYN").value = viz.downloadYN;
+	document.getElementById("dataLink").value = viz.dataLink;
+	document.getElementById("metadataLink").value = viz.metadataLink;
+	document.getElementById("DATA").value = viz.DATA;
+	chart_type_changed();
+}
+function chart_type_changed() {
+	const chart_type = document.getElementById("chartType").value;
+	switch (chart_type) {
+	case "Title":
+		document.getElementById('Title_fg').style.display = 'block';
+		document.getElementById('Subtitle_fg').style.display = 'block';
+		document.getElementById('Note_fg').style.display = 'block';
+		document.getElementById('Unit_fg').style.display = 'none';
+		document.getElementById('unitLoc_fg').style.display = 'none';
+		document.getElementById('Decimals_fg').style.display = 'none';
+		document.getElementById('LabelsYN_fg').style.display = 'none';
+		document.getElementById('legendConcept_fg').style.display = 'none';
+		document.getElementById('legendLoc_fg').style.display = 'none';
+		document.getElementById('xAxisConcept_fg').style.display = 'none';
+		document.getElementById('yAxisConcept_fg').style.display = 'none';
+		document.getElementById('downloadYN_fg').style.display = 'none';
+		document.getElementById('dataLink_fg').style.display = 'block';
+		document.getElementById('metadataLink_fg').style.display = 'block';
+		document.getElementById('DATA_fg').style.display = 'none';
+		break;
+	case "Value":
+		document.getElementById('Title_fg').style.display = 'block';
+		document.getElementById('Subtitle_fg').style.display = 'block';
+		document.getElementById('Note_fg').style.display = 'block';
+		document.getElementById('Unit_fg').style.display = 'block';
+		document.getElementById('unitLoc_fg').style.display = 'block';
+		document.getElementById('Decimals_fg').style.display = 'block';
+		document.getElementById('LabelsYN_fg').style.display = 'none';
+		document.getElementById('legendConcept_fg').style.display = 'none';
+		document.getElementById('legendLoc_fg').style.display = 'none';
+		document.getElementById('xAxisConcept_fg').style.display = 'none';
+		document.getElementById('yAxisConcept_fg').style.display = 'none';
+		document.getElementById('downloadYN_fg').style.display = 'none';
+		document.getElementById('dataLink_fg').style.display = 'block';
+		document.getElementById('metadataLink_fg').style.display = 'block';
+		document.getElementById('DATA_fg').style.display = 'block';
+		break;
+	case "Bar":
+	case "line":
+		document.getElementById('Title_fg').style.display = 'block';
+		document.getElementById('Subtitle_fg').style.display = 'block';
+		document.getElementById('Note_fg').style.display = 'block';
+		document.getElementById('Unit_fg').style.display = 'none';
+		document.getElementById('unitLoc_fg').style.display = 'none';
+		document.getElementById('Decimals_fg').style.display = 'none';
+		document.getElementById('LabelsYN_fg').style.display = 'block';
+		document.getElementById('legendConcept_fg').style.display = 'block';
+		document.getElementById('legendLoc_fg').style.display = 'block';
+		document.getElementById('xAxisConcept_fg').style.display = 'block';
+		document.getElementById('yAxisConcept_fg').style.display = 'block';
+		document.getElementById('downloadYN_fg').style.display = 'block';
+		document.getElementById('dataLink_fg').style.display = 'block';
+		document.getElementById('metadataLink_fg').style.display = 'block';
+		document.getElementById('DATA_fg').style.display = 'block';
+		break;
+	case "Pie":
+		document.getElementById('Title_fg').style.display = 'block';
+		document.getElementById('Subtitle_fg').style.display = 'block';
+		document.getElementById('Note_fg').style.display = 'block';
+		document.getElementById('Unit_fg').style.display = 'none';
+		document.getElementById('unitLoc_fg').style.display = 'none';
+		document.getElementById('Decimals_fg').style.display = 'none';
+		document.getElementById('LabelsYN_fg').style.display = 'block';
+		document.getElementById('legendConcept_fg').style.display = 'block';
+		document.getElementById('legendLoc_fg').style.display = 'block';
+		document.getElementById('xAxisConcept_fg').style.display = 'block';
+		document.getElementById('yAxisConcept_fg').style.display = 'none';
+		document.getElementById('downloadYN_fg').style.display = 'block';
+		document.getElementById('dataLink_fg').style.display = 'block';
+		document.getElementById('metadataLink_fg').style.display = 'block';
+		document.getElementById('DATA_fg').style.display = 'block';
+		break;
+	default:
+		document.getElementById('Title_fg').style.display = 'none';
+		document.getElementById('Subtitle_fg').style.display = 'none';
+		document.getElementById('Note_fg').style.display = 'none';
+		document.getElementById('Unit_fg').style.display = 'none';
+		document.getElementById('unitLoc_fg').style.display = 'none';
+		document.getElementById('Decimals_fg').style.display = 'none';
+		document.getElementById('LabelsYN_fg').style.display = 'none';
+		document.getElementById('legendConcept_fg').style.display = 'none';
+		document.getElementById('legendLoc_fg').style.display = 'none';
+		document.getElementById('xAxisConcept_fg').style.display = 'none';
+		document.getElementById('yAxisConcept_fg').style.display = 'none';
+		document.getElementById('downloadYN_fg').style.display = 'none';
+		document.getElementById('dataLink_fg').style.display = 'none';
+		document.getElementById('metadataLink_fg').style.display = 'none';
+		document.getElementById('DATA_fg').style.display = 'none';
+	}
+}
+</script>
+{% endblock editscripts %}
+
+{% block sidebars %}		
+<div class="offcanvas offcanvas-start" tabindex="-1" id="dashboardLayout" aria-labelledby="offcanvasExampleLabel">
+  <div class="offcanvas-header">
+	<h5 class="offcanvas-title" id="offcanvasExampleLabel">dashboardLayout</h5>
+	<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+	<div>
+	  Please set layout of the dashboard.
+	</div>
+		<form method = 'post', action = '/'>
+			<div class="form-floating mb-3" id="num_of_rows_fg">
+				<select class="form-control" id="num_of_rows" name="num_of_rows" onchange="num_of_rows_changed()">
+				  <option>1</option>
+				  <option>2</option>
+				  <option>3</option>
+				  <option>4</option>
+				</select>
+				<label for="num_of_rows">number of rows</label>
+			</div>
+			<div class="form-floating mb-3" id="num_of_col_row1_fg" hidden>
+				<select class="form-control" id="num_of_col_row1" name="num_of_col_row1">
+				  <option>1</option>
+				  <option>2</option>
+				  <option>3</option>
+				</select>
+				<label for="num_of_col_row1">number of columns in row 1</label>
+			</div>
+			<div class="form-floating mb-3" id="num_of_col_row2_fg" hidden>
+				<select class="form-control" id="num_of_col_row2" name="num_of_col_row2">
+				  <option>1</option>
+				  <option>2</option>
+				  <option>3</option>
+				</select>
+				<label for="num_of_col_row2">number of columns in row 2</label>
+			</div>
+			<div class="form-floating mb-3" id="num_of_col_row3_fg" hidden>
+				<select class="form-control" id="num_of_col_row3" name="num_of_col_row3">
+				  <option>1</option>
+				  <option>2</option>
+				  <option>3</option>
+				</select>
+				<label for="num_of_col_row3">number of columns in row 3</label>
+			</div>
+			<div class="form-floating mb-3" id="num_of_col_row4_fg" hidden>
+				<select class="form-control" id="num_of_col_row4" name="num_of_col_row4">
+				  <option>1</option>
+				  <option>2</option>
+				  <option>3</option>
+				</select>
+				<label for="num_of_col_row4">number of columns in row 4</label>
+			</div>
+			<div class="form-group" hidden>
+				<textarea class="form-control" rows="17" id="Textarea1" name='Configuration'>{{configuration}}</textarea>
+			</div>	
+			<div class="form-group d-flex justify-content-between" >		  
+				<input type="submit" name = 'form' value="Update Layout"/>
+			</div>
+		</form> 
+  </div>
+</div>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="YAMLConfiguration" aria-labelledby="offcanvasExampleLabel">
+  <div class="offcanvas-header">
+	<h5 class="offcanvas-title" id="offcanvasExampleLabel">Dashboard Configuration</h5>
+	<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+	<div>
+	  Please provide YAML input to configure the SDMX dashboard.  You can also save your dashboard for others to use.
+	</div>
+		<form method = 'post', action = '/'>
+		  <div class="form-group" >
+			<label for="Textarea1">YAML Input:</label>
+			<textarea class="form-control" rows="17" id="Textarea1" name='Configuration'>{{configuration}}</textarea>
+		  </div>
+		 <div class="form-group d-flex justify-content-between" >
+		  <input type="submit" name='form' value="Update Configuration"/>
+		  </div>
+		</form> 
+  </div>
+</div>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample2" aria-labelledby="offcanvasExampleLabel">
+  <div class="offcanvas-header">
+	<h5 class="offcanvas-title" id="offcanvasExampleLabel">Dashboard Configuration</h5>
+	<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+	<div>
+	  Please provide configure of visualization.
+	</div>
+		<form method = 'post', action = '/'>
+			<div class="form-floating mb-3" hidden>
+				<input type="number" class="form-control" id="viz_row_num" name="Row">
+				<label for="Row">Row</label>
+			</div>
+			<div class="form-floating mb-3">
+				<select class="form-control" id="chartType" name="chartType" onchange ="chart_type_changed()">
+				  <option selected disabled>Unconfigured</option>
+				  <option>Title</option>
+				  <option>Value</option>
+				  <option>Pie</option>
+				  <option>Line</option>
+				  <option>Bar</option>
+				</select>
+				<label for="chartType">Chart Type</label>
+			</div>
+			<div class="form-floating mb-3" id="Title_fg">
+				<input type="text" class="form-control" id="Title" name="Title">
+				<label for="Title">Title</label>
+			</div>
+			<div class="form-floating mb-3" id="Subtitle_fg">
+				<input type="text" class="form-control" id="Subtitle" name="Subtitle">
+				<label for="Subtitle">Subtitle</label>
+			</div>
+			<div class="form-floating mb-3" id="Note_fg">
+				<input type="text" class="form-control" id="Note" name="Note">
+				<label for="Note">Note</label>
+			</div>
+			<div class="form-floating mb-3" id="Unit_fg">
+				<input type="text" class="form-control" id="Unit" name="Unit">
+				<label for="Unit">Unit</label>
+			</div>
+			<div class="form-floating mb-3" id="unitLoc_fg">
+				<select class="form-control" id="unitLoc" name="unitLoc">
+				  <option>Prefix</option>
+				  <option>Suffix</option>
+				  <option>Under</option>
+				  <option>Hide</option>
+				</select>
+				<label for="unitLoc">Unit Location</label>
+			</div>
+			<div class="form-floating mb-3" id="Decimals_fg">
+				<input type="text" class="form-control" id="Decimals" name="Decimals">
+				<label for="Decimals">Decimals to display</label>
+			</div>
+			<div class="form-check form-switch mb-3" id="LabelsYN_fg">
+				<label class="form-check-label" for="LabelsYN">Display Labels</label>
+				<input class="form-check-input" type="checkbox" role="switch" id="LabelsYN" name="LabelsYN">
+			</div>
+			<div class="form-floating mb-3" id="legendConcept_fg">
+				<input type="text" class="form-control" id="legendConcept" name="legendConcept">
+				<label for="legendConcept">Legend Concept</label>
+			</div>
+			<div class="form-floating mb-3" id="legendLoc_fg">
+				<select class="form-control" id="legendLoc" name="legendLoc">
+				  <option>Top</option>
+				  <option>Bottom</option>
+				  <option>Left</option>
+				  <option>Right</option>
+				  <option>Hide</option>
+				</select>
+				<label for="legendLoc">Legend Location</label>
+			</div>					
+			<div class="form-floating mb-3" id="xAxisConcept_fg">
+				<input type="text" class="form-control" id="xAxisConcept" name="xAxisConcept">
+				<label for="xAxisConcept">X-axis Concept</label>
+			</div>
+			<div class="form-floating mb-3" id="yAxisConcept_fg">
+				<input type="text" class="form-control" id="yAxisConcept" name="yAxisConcept">
+				<label for="yAxisConcept">Y-axis Concept</label>
+			</div>
+			<div class="form-check form-switch mb-3" id="downloadYN_fg">
+				<label class="form-check-label" for="downloadYN">Enable Download</label>
+				<input class="form-check-input" type="checkbox" role="switch" id="downloadYN" name="downloadYN">
+			</div>
+			<div class="form-floating mb-3" id="dataLink_fg">
+				<input type="text" class="form-control" id="dataLink" name="dataLink">
+				<label for="dataLink">Data Link</label>
+			</div>
+			<div class="form-floating mb-3" id="metadataLink_fg">
+				<input type="text" class="form-control" id="metadataLink" name="metadataLink">
+				<label for="metadataLink">Metadata Link</label>
+			</div>
+			<div class="form-floating mb-3" id="DATA_fg">
+				<input type="text" class="form-control" id="DATA" name="DATA">
+				<label for="DATA">Data</label>
+			</div>
+			<div class="form-floating mb-3" hidden>
+				<input type="number" class="form-control" id="viz_col_num" name="viz_col_num">
+				<label for="viz_col_num">viz_col_num</label>
+			</div>
+			<div class="form-group" hidden>
+				<textarea class="form-control" rows="17" id="Textarea1" name='Configuration'>{{configuration}}</textarea>
+			</div>	
+			<div class="form-group d-flex justify-content-between" >
+				<input type="submit" name='form' value="Update Visual"/>
+			</div>
+		</form> 
+  </div>
+</div>
+{% endblock sidebars %}
+
+{% block editbuttons %}
+<div class="btn-group" role="group" aria-label="Basic outlined example">
+	<button type="button" class="btn btn-outline-primary btn-lg btn-block" data-bs-toggle="offcanvas" href="#dashboardLayout">Configure Dashboard Layout</button>
+	<button type="button" class="btn btn-outline-primary btn-lg btn-block" data-bs-toggle="offcanvas" href="#YAMLConfiguration">Edit YAML Configuration</button>
+	<button type="button" class="btn btn-outline-primary btn-lg btn-block">Save Dashboard</button>
+</div>	
+{% endblock editbuttons %}		
+
+{% block charteditbuttons %}
+<a type="button" onclick="loadVisualConfiguration({{row_num}},{{col_num}}, {{viz|to_json}})" class="btn btn-outline-danger btn-sm float-end" data-bs-toggle="offcanvas" href="#offcanvasExample2">Edit Visual</a>
+{% endblock charteditbuttons %}

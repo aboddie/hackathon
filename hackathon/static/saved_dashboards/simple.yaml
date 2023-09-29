@@ -1,0 +1,20 @@
+---
+DashID: ExampleCL
+Rows:
+-
+    Row: 0
+    chartType: TITLE
+    Title: " The Labour Market at a glance"
+    Subtitle: "Example of a dashboard script with data from Chile"
+    Unit: 
+    unitLoc: 
+    Decimals: 
+    LabelsYN:
+    legendConcept: 
+    legendLoc: 
+    xAxisConcept: 
+    yAxisConcept: 
+    downloadYN: 
+    dataLink: 
+    metadataLink: 
+    DATA: 
