@@ -1,6 +1,7 @@
 from collections import Counter
 import json
-import os 
+import os
+import re
 from typing import Counter #TODO Drop once put on webapp and use python >=3.9
 from typing import Dict
 from typing import List
@@ -137,8 +138,7 @@ def pulldata(viz):
         req = sdmx.Request()
         myfile = req.get(url=url)
         dataflows = sdmx.to_pandas(myfile)
-        dsd = myfile.structure
-        dimensions = [x.id for x in dsd.dimensions]
+        p = re.compile(r"{\$(.*)}")
         for key, value in viz.items():
             if key == 'DATA':
                 viz[key] = dataflows.values.tolist()
@@ -150,13 +150,14 @@ def pulldata(viz):
                 except:
                     pass
             else:
-                if (str(value)[:2] == '{$') & (str(value)[-1] == '}'):
-                    try:
-                        code = dataflows.keys().get_level_values(str(value)[2:-1]).to_list()[0]
-                        viz[key] = code
+                try:
+                    if re.search(p, value):
+                        lookupvalue = re.search(p, value).group(1)
+                        code = dataflows.keys().get_level_values(lookupvalue).to_list()[0]
+                        viz[key] = re.sub(f"{{\$({lookupvalue})}}", code, value)
                         #TODO: code to name use dsd and pull
-                    except:
-                        viz[key] = "Need to fix this"
+                except:
+                    pass
     viz['chartType'], viz['width'] = get_chart_type(viz['chartType'])
     viz['TitleFormated'] = get_formating(viz.get('Title',None), unit=viz.get('Unit',None), unit_location=viz.get('unitLoc','Hide'))
     viz['SubtitleFormated'] = get_formating(viz.get('Subtitle',None))
