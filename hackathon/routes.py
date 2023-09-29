@@ -200,6 +200,13 @@ def home():
             configuration["Rows"][index_value] = viz_configuration
         elif request.form['form'] == 'Update Configuration':
             pass
+        elif request.form['form'] == 'Save Configuration':
+            dashid = configuration['DashID']
+            with open(f'hackathon/static/saved_dashboards/{dashid}.yaml','w') as yamlfile:
+                #TODO yaml.dump is pulling off quotes and dropping duplicate visuals
+                yaml.Dumper.ignore_aliases = lambda *args : True
+                configuration_dump = yaml.dump(configuration.data, sort_keys=False)
+
 
         #TODO yaml.dump is pulling off quotes and dropping duplicate visuals
         yaml.Dumper.ignore_aliases = lambda *args : True
