@@ -212,7 +212,7 @@ function chart_type_changed() {
 	<div>
 	  Please provide YAML input to configure the SDMX dashboard.  You can also save your dashboard for others to use.
 	</div>
-		<form method = 'post', action = '/'>
+		<form id = 'UpdateConfiguration' method = 'post', action = '/'>
 		  <div class="form-group" >
 			<label for="Textarea1">YAML Input:</label>
 			<textarea class="form-control" rows="17" id="Textarea1" name='Configuration'>{{configuration}}</textarea>
@@ -339,7 +339,7 @@ function chart_type_changed() {
 <div class="btn-group" role="group" aria-label="Basic outlined example">
 	<button type="button" class="btn btn-outline-primary btn-lg btn-block" data-bs-toggle="offcanvas" href="#dashboardLayout">Configure Dashboard Layout</button>
 	<button type="button" class="btn btn-outline-primary btn-lg btn-block" data-bs-toggle="offcanvas" href="#YAMLConfiguration">Edit YAML Configuration</button>
-	<button type="button" class="btn btn-outline-primary btn-lg btn-block">Save Dashboard</button>
+	<button type="submit" form="UpdateConfiguration" name='form' value="Save Configuration" class="btn btn-outline-primary btn-lg btn-block">Save Dashboard</button>
 </div>	
 {% endblock editbuttons %}		
 
