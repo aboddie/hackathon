@@ -112,7 +112,7 @@ def get_chart_type(text: str) -> Tuple[str, str]:
     '''Pulls chart type and width from text. Defaults to unsonfigured, col.'''
     text_list = [x.strip() for x in text.lower().split(",")]
     size_options = {'single': 'col-4', 'double': 'col-8', 'triple': 'col-12'}
-    chart_Mapping = {'title': 'title', 'pie': 'pie', 'value': 'value', 'lines': 'lines', 'bars': 'bars', 'unconfigured': 'unconfigured'}
+    chart_Mapping = {'title': 'title', 'pie': 'pie', 'value': 'value', 'lines': 'line', 'bars': 'bars', 'unconfigured': 'unconfigured'}
     width = 'col-4'
     chart_type = 'unconfigured'
     for option in text_list:
