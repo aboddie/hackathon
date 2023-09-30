@@ -105,7 +105,7 @@
 								  type: '{{viz["chartType"]}}',
 								  data: {
 									  {% if viz["legendConcept"]%}
-										labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
+											labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
 									  {% endif %}
 									  datasets: [{
 										data: {{viz["DATA"]}}
@@ -129,7 +129,7 @@
 								  type: '{{viz["chartType"]}}',
 								  data: {
 									  {% if viz["legendConcept"]%}
-										labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
+											labels: [{%for concept in viz["legendConcept"]%}'{{concept}}', {% endfor %}],
 									  {% endif %}
 									  datasets: [{
 										data: {{viz["DATA"]}}
