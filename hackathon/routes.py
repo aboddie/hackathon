@@ -149,7 +149,7 @@ def pulldata(viz):
                         viz[key] = code
                         #TODO: code to name use dsd and pull (Pandasdmx doesn't seem to pull either URNs or local representations from the sample file, should probably switch to something else)
                     except:
-                        pass
+                        viz[key] = [value]
                 else:
                     try:
                         if re.search(p, value):
