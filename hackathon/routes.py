@@ -140,27 +140,44 @@ def pulldata(viz):
             myfile = req.get(url=url)
             dataflows = sdmx.to_pandas(myfile)
             p = re.compile(r"{\$(.*)}")
-            for key, value in viz.items():
-                if key == 'DATA':
-                    viz[key] = dataflows.values.tolist()
-                elif key in ['xAxisConcept','yAxisConcept', 'legendConcept']:
+            for key in ['xAxisConcept','yAxisConcept']:
+                if viz[key] is not None:
                     try:
-                        code = dataflows.keys().get_level_values(str(value)).to_list()
+                        code = dataflows.keys().get_level_values(str(viz[key])).to_list()
                         viz[key] = code
                         #TODO: code to name use dsd and pull (Pandasdmx doesn't seem to pull either URNs or local representations from the sample file, should probably switch to something else)
                     except:
-                        viz[key] = [value]
-                else:
-                    try:
-                        if re.search(p, value):
-                            lookupvalue = re.search(p, value).group(1)
-                            code = dataflows.keys().get_level_values(lookupvalue).to_list()[0]
-                            viz[key] = re.sub(f"{{\$({lookupvalue})}}", code, value)
-                            #TODO: code to name use dsd and pull
-                    except:
-                        pass
-        except:
-            viz['DATA'] = [0]
+                        viz[key] = [viz[key]]
+            #try:
+            #    legendConcept_list = list(set(dataflows.keys().get_level_values(str(viz['legendConcept'])).to_list()))
+            #except:
+            #    legendConcept_list = []
+            #if len(legendConcept_list) > 1:
+            #    print(legendConcept_list)
+            #    data_list = []
+            #    for concept in legendConcept_list:
+            #        data_list.append(dataflows[dataflows.index.get_level_values(str(viz['legendConcept'])) == concept].to_list())
+            #    viz['DATA'] = data_list
+            #    viz['legendConcept'] = legendConcept_list
+            #else:
+            viz['DATA'] = dataflows.values.tolist()
+            try:
+                viz['legendConcept'] = dataflows.keys().get_level_values(str(viz['legendConcept'])).to_list()
+            except:
+                viz['legendConcept'] = [viz['legendConcept']]
+            for key, value in viz.items():
+                try:
+                    if re.search(p, value):
+                        lookupvalue = re.search(p, value).group(1)
+                        code = dataflows.keys().get_level_values(lookupvalue).to_list()[0]
+                        viz[key] = re.sub(f"{{\$({lookupvalue})}}", code, value)
+                        #TODO: code to name use dsd and pull
+                except:
+                    pass
+        except Exception as e:
+            print(e)
+            if type(viz['DATA']) == str:
+                viz['DATA'] = [0]
     viz['chartType'], viz['width'] = get_chart_type(viz['chartType'])
     viz['TitleFormated'] = get_formating(viz.get('Title',None), unit=viz.get('Unit',None), unit_location=viz.get('unitLoc','Hide'))
     viz['SubtitleFormated'] = get_formating(viz.get('Subtitle',None))
