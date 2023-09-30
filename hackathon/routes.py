@@ -1,7 +1,7 @@
 from collections import Counter
 import json
 import os
-import re
+import re 
 from typing import Counter #TODO Drop once put on webapp and use python >=3.9
 from typing import Dict
 from typing import List
@@ -227,7 +227,6 @@ def home():
                 #TODO yaml.dump is pulling off quotes and dropping duplicate visuals
                 yaml.Dumper.ignore_aliases = lambda *args : True
                 configuration_dump = yaml.dump(configuration.data, sort_keys=False)
-
 
         #TODO yaml.dump is pulling off quotes and dropping duplicate visuals
         yaml.Dumper.ignore_aliases = lambda *args : True
