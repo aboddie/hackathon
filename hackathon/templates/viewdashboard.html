@@ -124,7 +124,7 @@
 									}
 								  }
 								});
-						{% elif  viz["chartType"] == 'lines' %}
+						{% elif  viz["chartType"] == 'line' %}
 							new Chart(document.getElementById('Chart{{row_num}}_{{col_num}}'), {
 								  type: '{{viz["chartType"]}}',
 								  data: {
