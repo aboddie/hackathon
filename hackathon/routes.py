@@ -134,30 +134,33 @@ def create_table_setup(yaml_configuration: YAMLConfiguration) -> List:
 def pulldata(viz):
     #if there is data
     if (viz['DATA'] is not None) and (viz['DATA'] != 'None'):
-        url = viz['DATA']
-        req = sdmx.Request()
-        myfile = req.get(url=url)
-        dataflows = sdmx.to_pandas(myfile)
-        p = re.compile(r"{\$(.*)}")
-        for key, value in viz.items():
-            if key == 'DATA':
-                viz[key] = dataflows.values.tolist()
-            elif key in ['xAxisConcept','yAxisConcept', 'legendConcept']:
-                try:
-                    code = dataflows.keys().get_level_values(str(value)).to_list()
-                    viz[key] = code
-                    #TODO: code to name use dsd and pull (Pandasdmx doesn't seem to pull either URNs or local representations from the sample file, should probably switch to something else)
-                except:
-                    pass
-            else:
-                try:
-                    if re.search(p, value):
-                        lookupvalue = re.search(p, value).group(1)
-                        code = dataflows.keys().get_level_values(lookupvalue).to_list()[0]
-                        viz[key] = re.sub(f"{{\$({lookupvalue})}}", code, value)
-                        #TODO: code to name use dsd and pull
-                except:
-                    pass
+        try:
+            url = viz['DATA']
+            req = sdmx.Request()
+            myfile = req.get(url=url)
+            dataflows = sdmx.to_pandas(myfile)
+            p = re.compile(r"{\$(.*)}")
+            for key, value in viz.items():
+                if key == 'DATA':
+                    viz[key] = dataflows.values.tolist()
+                elif key in ['xAxisConcept','yAxisConcept', 'legendConcept']:
+                    try:
+                        code = dataflows.keys().get_level_values(str(value)).to_list()
+                        viz[key] = code
+                        #TODO: code to name use dsd and pull (Pandasdmx doesn't seem to pull either URNs or local representations from the sample file, should probably switch to something else)
+                    except:
+                        pass
+                else:
+                    try:
+                        if re.search(p, value):
+                            lookupvalue = re.search(p, value).group(1)
+                            code = dataflows.keys().get_level_values(lookupvalue).to_list()[0]
+                            viz[key] = re.sub(f"{{\$({lookupvalue})}}", code, value)
+                            #TODO: code to name use dsd and pull
+                    except:
+                        pass
+        except:
+            viz['DATA'] = [0]
     viz['chartType'], viz['width'] = get_chart_type(viz['chartType'])
     viz['TitleFormated'] = get_formating(viz.get('Title',None), unit=viz.get('Unit',None), unit_location=viz.get('unitLoc','Hide'))
     viz['SubtitleFormated'] = get_formating(viz.get('Subtitle',None))
