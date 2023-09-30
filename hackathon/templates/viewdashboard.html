@@ -99,7 +99,7 @@
 							const ctx{{row_num}}_{{col_num}} = canvas{{row_num}}_{{col_num}}.getContext("2d");
 							ctx{{row_num}}_{{col_num}}.textAlign = "center";
 							ctx{{row_num}}_{{col_num}}.font = "30px Arial";
-							ctx{{row_num}}_{{col_num}}.fillText({{viz["DATA"][0]}}, canvas{{row_num}}_{{col_num}}.width / 2, 30);
+							ctx{{row_num}}_{{col_num}}.fillText('{{viz["DATA"][0]}}', canvas{{row_num}}_{{col_num}}.width / 2, 30);
 						{% elif  viz["chartType"] == 'pie' %}
 							new Chart(document.getElementById('Chart{{row_num}}_{{col_num}}'), {
 								  type: '{{viz["chartType"]}}',
